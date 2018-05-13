@@ -156,6 +156,8 @@ classdef Simulation < matlab.System
             
             %Define variables to be eliminated and convert to matricies
             vars = [Fgx Fgy Fgz Mgx Mgy Fox Foy Foz];
+            fprintf ("HELP")
+            eliminate(eqs, vars)
             [MAT, SOL] = equationsToMatrix(eqs_READ,vars);
             
             %Use this to reduce the number of equations (type MAT in command to see why
@@ -293,6 +295,7 @@ classdef Simulation < matlab.System
             g3 = temp1(1);
             g4 = temp1(2);
             
+
             g1 = simplify(g1);
             g2 = simplify(g2);
             g3 = simplify(g3);
@@ -315,6 +318,10 @@ classdef Simulation < matlab.System
             %Y = subs(Y);
             
             H = linsolve(X,Y);
+            subs(H(1))
+            subs(H(2))
+            subs(H(3))
+            subs(H(1))
             obj.H1 = @(A, B, C, D, d_A, d_B, d_C, d_D) (subs(H(1)));
             obj.H2 = @(A, B, C, D, d_A, d_B, d_C, d_D) (subs(H(2)));
             obj.H3 = @(A, B, C, D, d_A, d_B, d_C, d_D) (subs(H(3)));
@@ -336,6 +343,8 @@ classdef Simulation < matlab.System
            gamma = zeros(1, tEnd*fps);
            delta = zeros(1, tEnd*fps);
            % generate ode model
+           
+           
            obj.X = [obj.a_0, obj.b_0, obj.c_0, obj.d_0, obj.dA_0, obj.dB_0, obj.dC_0, obj.dD_0];
            [T, Y] = ode45(@ddt.diffX,  [0 tEnd], obj.X);
            
@@ -344,19 +353,11 @@ classdef Simulation < matlab.System
             
            % compute state at every frame
            for i = 1:numel(t)
-               % intrapolate values of A B C and D
-               for j = 1:(numel(T)-1)
-                   if T(j+1)>t(i)
-                           break
-                   end
-               end
-               alpha(i) = Y(j,1) + t(i)*(Y(j+1,5)-Y(j,5))/(T(j+1)-T(j)); %alpha at time step
-               beta(i) = Y(j,2) + t(i)*(Y(j+1,6)-Y(j,6))/(T(j+1)-T(j)); %beta at time step
-               gamma(i) = Y(j,3) + t(i)*(Y(j+1,7)-Y(j,7))/(T(j+1)-T(j)); %gamma at time step
-               delta(i) = Y(j,4) + t(i)*(Y(j+1,8)-Y(j,8))/(T(j+1)-T(j)); %delta at time step
-            end
-        
-            
+               alpha(i) = Y(i,1); %alpha at time step
+               beta(i) = Y(i,2); %beta at time step
+               gamma(i) = Y(i,3); %gamma at time step
+               delta(i) = Y(i,4); %delta at time step
+           end       
         end
     end
 end
